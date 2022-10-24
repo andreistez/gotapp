@@ -3,65 +3,57 @@ import './charDetails.css'
 import Spinner from '../spinner'
 import gotService from '../../services/gotService'
 
+const Field = ( { item, field, label } ) => {
+    return (
+        <li className="list-group-item d-flex justify-content-between">
+            <span className="term">{ label }</span>
+            <span>{ item[field] }</span>
+        </li>
+    )
+}
+
+export { Field }
+
 export default class CharDetails extends Component {
     gotService = new gotService()
     state = {
-        char: null
+        item: null
     }
 
     componentDidMount(){
-        this.updateChar()
+        this.updateItem()
     }
 
     componentDidUpdate( prevProps){
-        if( this.props.selectedChar !== prevProps.selectedChar )
-            this.updateChar()
+        if( this.props.selectedItem !== prevProps.selectedItem )
+            this.updateItem()
     }
 
-    updateChar = () => {
-        const { selectedChar } = this.props
+    updateItem = () => {
+        const { selectedItem } = this.props
 
-        if( ! selectedChar ) return
+        if( ! selectedItem ) return
 
-        this.gotService.getCharacter( selectedChar )
-            .then( char => this.setState( { char } ) )
+        this.gotService.getCharacter( selectedItem )
+            .then( item => this.setState( { item } ) )
     }
 
     render() {
-        const { char } = this.state
+        const { item } = this.state
+
+        if( ! item ) return <Spinner />
 
         return (
             <div className="char-details rounded">
-                { char ? <View selectedChar={ char }/> : <Spinner/> }
+                 <h4>{ item.name }</h4>
+                <ul className="list-group list-group-flush">
+                    {
+                        React.Children.map( this.props.children, child => {
+                            return React.cloneElement( child, { item } )
+                        } )
+                    }
+                </ul>
             </div>
         )
     }
-}
-
-const View = ( { selectedChar } ) => {
-    const { name, gender, born, died, culture } = selectedChar
-
-    return (
-        <>
-            <h4>{ name }</h4>
-            <ul className="list-group list-group-flush">
-                <li className="list-group-item d-flex justify-content-between">
-                    <span className="term">Gender</span>
-                    <span>{ gender }</span>
-                </li>
-                <li className="list-group-item d-flex justify-content-between">
-                    <span className="term">Born</span>
-                    <span>{ born }</span>
-                </li>
-                <li className="list-group-item d-flex justify-content-between">
-                    <span className="term">Died</span>
-                    <span>{ died }</span>
-                </li>
-                <li className="list-group-item d-flex justify-content-between">
-                    <span className="term">Culture</span>
-                    <span>{ culture }</span>
-                </li>
-            </ul>
-        </>
-    )
 }

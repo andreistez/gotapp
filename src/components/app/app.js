@@ -4,12 +4,15 @@ import Header from '../header'
 import RandomChar from '../randomChar'
 import CharacterPage from '../characterPage'
 import ErrorMessage from '../errorMessage'
+import ItemList from '../itemList'
+import gotService from '../../services/gotService'
 
 export default class App extends Component {
     state = {
         isRandomCharVisible : true,
         error               : false
     }
+    gotService = new gotService()
 
     componentDidCatch( error, errorInfo ){
         this.setState( { error: true } )
@@ -41,7 +44,33 @@ export default class App extends Component {
                             </Button>
                         </Col>
                     </Row>
+
                     <CharacterPage />
+
+                    <Row>
+                        <Col md='6'>
+                            <ItemList
+                                onItemSelected={ this.onItemSelected }
+                                getData={ this.gotService.getAllBooks }
+                                renderItem={ item => item.name }
+                            />
+                        </Col>
+                        <Col md='6'>
+                            {/*<CharDetails selectedChar={ char }/>*/}
+                        </Col>
+                    </Row>
+                    <Row>
+                        <Col md='6'>
+                            <ItemList
+                                onItemSelected={ this.onItemSelected }
+                                getData={ this.gotService.getAllHouses }
+                                renderItem={ item => item.name }
+                            />
+                        </Col>
+                        <Col md='6'>
+                            {/*<CharDetails selectedChar={ char }/>*/}
+                        </Col>
+                    </Row>
                 </Container>
             </>
         )

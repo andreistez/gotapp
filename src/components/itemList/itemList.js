@@ -1,41 +1,40 @@
 import React, { Component } from 'react'
-import gotService from '../../services/gotService'
 import './itemList.css'
-import Spinner from '../spinner'
 
 export default class ItemList extends Component {
-    gotService = new gotService()
     state = {
-        charList: null
+        itemList: null
     }
 
     componentDidMount(){
-        this.gotService.getAllCharacters( this.props.page, this.props.pageSize )
-            .then( charList => this.setState( { charList } ) )
+        const { getData } = this.props
+        getData().then( itemList => this.setState( { itemList } ) )
+    }
+
+    renderItems = arr => {
+        if( ! arr || ! arr.length ) return
+
+        return ( arr.map( item => {
+            const { id } = item,
+                  label = this.props.renderItem( item )
+
+            return (
+                <li
+                    key={ id }
+                    className="list-group-item"
+                    onClick={ () => this.props.onItemSelected( id ) }
+                >{ label }</li>
+            )
+        } ) )
     }
 
     render() {
-        const { charList } = this.state,
-              { onCharSelected } = this.props
+        const { itemList } = this.state
 
-        return charList ? <View charList={ charList } onCharSelected={ onCharSelected } /> : <Spinner />
+        return (
+            <ul className="item-list list-group">
+                { this.renderItems( itemList ) }
+            </ul>
+        )
     }
-}
-
-const View = ( { charList, onCharSelected } ) => {
-    return (
-        <ul className="item-list list-group">
-            {
-                charList.length
-                    ? charList.map( ( char, i ) => (
-                        <li
-                            key={ `${ char.name + char.gender + char.born + char.died }` }
-                            className="list-group-item"
-                            onClick={ () => onCharSelected( i ) }
-                        >{ char.name }</li>
-                    ) )
-                    : <Spinner />
-            }
-        </ul>
-    )
 }
